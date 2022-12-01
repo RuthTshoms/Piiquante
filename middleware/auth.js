@@ -2,11 +2,10 @@ const jwt = require('jsonwebtoken');
  
 module.exports = (req, res, next) => {
   try {
-      const token = req.get('Authorization');
-      console.log(token);
+      const token = req.get('Authorization'); 
       const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
       const userId = decodedToken.userId;
-      req.auth = {
+      req.auth = { // ajout de l'id user à l'objet req. (ce qui s'apprête à être envoyé)
           userId: userId
      };
 	next();

@@ -19,7 +19,6 @@ exports.signup = (req, res, next) => {
 
 
 exports.login = (req, res, next) => {
-  console.log('hello');
   User.findOne({ email: req.body.email })
        .then(user => {
            if (!user) {
@@ -46,4 +45,4 @@ exports.login = (req, res, next) => {
 
 // exports.test = (req, res, next) => {
 //   res.status(200).send({ message: 'Ok' });
-// };
+// }; ""

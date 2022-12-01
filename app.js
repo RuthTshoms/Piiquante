@@ -13,8 +13,8 @@ mongoose.connect('mongodb+srv://RuthTshoms:eE0ri1hP6IABCwTV@cluster0.zkucozn.mon
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-const cors = require('cors'); // autoriser les requêtes multi origines
-app.use(cors());
+const cors = require('cors'); 
+app.use(cors()); // autoriser les requêtes multi originess
 
 
 app.use((req, res, next) => {
