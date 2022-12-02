@@ -1,3 +1,5 @@
+//** Infos de connexion qui seront transmisent aux différentes méthodes de requêtes  */
+
 const jwt = require('jsonwebtoken');
  
 module.exports = (req, res, next) => {
