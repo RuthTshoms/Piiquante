@@ -16,6 +16,3 @@ const sauceSchema = mongoose.Schema({
 
 module.exports = mongoose.model('Sauce', sauceSchema);
 
-// model sauce qui sera utile pour POST /api/sauce, 
-// PUT /api/sauces/:id, 
-// POST /api/sauces/:id/like
