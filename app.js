@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 
 
 //** Middleware qui analyse les req JSON entrantes, accessiblent via req.body */ // pareil que body-parser ? 
-//app.use(express.json()); // appel  bonne place ? au dessus des cors ?
+app.use(express.json()); // au dessus des cors ?
 
 // app.use(bodyParser.json()); // ???
 
