@@ -14,10 +14,6 @@ const sauceSchema = mongoose.Schema({
   usersDisliked: { type: [String] },
 });
 
-// const sauceSchema = mongoose.Schema({
-//   sauce: { type: String, require: true },
-//   image: { type: String, require: true }, //
-// });
 
 module.exports = mongoose.model('Sauce', sauceSchema);
 
