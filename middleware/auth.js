@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken'); // importation du package jsonwebtoken
+const jwt = require('jsonwebtoken'); // package qui permet de créer et vérifier les tokens d'authentification 
  
 //** Extraction et vérification des infos contenues dans le token, et transmissions aux autres middlewares ou gestionnaires de route */
 module.exports = (req, res, next) => {

@@ -1,10 +1,11 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt'); // module node qui permet de hasher les mots de passe 
+const jwt = require('jsonwebtoken'); // package qui permet de créer et vérifier les tokens d'authentification 
 
-const User = require('../models/user');
+const User = require('../models/user'); // importation du schéma de données pour les users
 
+//** Enregistrement d'un nouvel utilisateur dans la base de données */
 exports.signup = (req, res, next) => {
-  bcrypt.hash(req.body.password, 10)
+  bcrypt.hash(req.body.password, 10) // fonction hash du package de chiffrement "bcrypt" sur le mdp renseigné, avec "salage" du mdp 10 fois (augmentation de la sécurité) 
     .then(hash => {
       const user = new User({
         email: req.body.email,
@@ -12,12 +13,12 @@ exports.signup = (req, res, next) => {
       });
       user.save()
         .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(400).json({ error })); 
     })
-    .catch(error => res.status(500).json({ error }));
+    .catch(error => res.status(500).json({ error })); // erreur serveur (ne peut pas répondre à la req)
 };
 
-
+//**  */
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
        .then(user => {
@@ -43,6 +44,3 @@ exports.login = (req, res, next) => {
        .catch(error => res.status(500).json({ error }));
 };
 
-// exports.test = (req, res, next) => {
-//   res.status(200).send({ message: 'Ok' });
-// }; ""
