@@ -8,7 +8,7 @@ const User = require('../models/user'); // importation du schéma de données po
 exports.signup = (req, res, next) => {
   bcrypt.hash(req.body.password, 10) // fonction hash du package de chiffrement "bcrypt" sur le mdp passé par le frontend, hashage/cryptage/salage 10 fois (augmentation de la sécurité) 
     .then(hash => {
-      const user = new User({ // création du nouveau user sur base du modle mongoose 
+      const user = new User({ // création du nouveau user sur base du modele mongoose 
         email: req.body.email,
         password: hash
       });
