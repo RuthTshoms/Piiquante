@@ -1,6 +1,6 @@
 const express = require('express'); // framework qui permet le déploiement de l'API plus rapidement
 const bodyParser = require('body-parser'); // module node qui stocke les données des req POST en objets javascript, accesiblent via req.body
-const mongoose = require('mongoose'); // permet l'utilisation des fonctionnalités du module 
+const mongoose = require('mongoose'); // permet de lier node.js et mongoDB et impose la structure des objets via des schemas qui seront enregistré dans la bdd 
 
 //** Importation de nos routeurs */
 const userRoutes = require('./routes/user');
