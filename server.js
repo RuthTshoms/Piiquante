@@ -1,6 +1,7 @@
-const http = require('http');
+const http = require('http'); // package HTTP qui permet de créer un serveur node ?...
 const app = require('./app');
 
+//** Fonction renvoyant un port valide, qu'il soit fourni sous la forme d'un numéro ou d'une chaîne */
 const normalizePort = val => {
   const port = parseInt(val, 10);
 
@@ -15,6 +16,7 @@ const normalizePort = val => {
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
+//** Fonction recherchant les différentes erreurs et les gère de manière appropriée. Elle est ensuite enregistrée dans le serveur */
 const errorHandler = error => {
   if (error.syscall !== 'listen') {
     throw error;
@@ -35,10 +37,11 @@ const errorHandler = error => {
   }
 };
 
+//** Création du serveur web, qui gère les req et les res */
 const server = http.createServer(app);
 
 server.on('error', errorHandler);
-server.on('listening', () => {
+server.on('listening', () => { // écouter le port ou le canal nommé sur lequel le serveur s'exécute dans la console.
   const address = server.address();
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
   console.log('Listening on ' + bind);
