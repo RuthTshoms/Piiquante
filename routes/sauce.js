@@ -9,7 +9,7 @@ const sauceCtrl = require('../controllers/sauce');
 //** Lister les routes disponibles à quelles points de terminaisons et pour quelles fonctions et controllers  */
 router.get('/', auth, sauceCtrl.getAllSauces); 
 router.post('/', auth, multer, sauceCtrl.createSauce); 
-//router.get('/:id', sauceCtrl.getOneSauce);
+router.get('/:id', auth, sauceCtrl.getOneSauce);
 //router.post('/')
 
 

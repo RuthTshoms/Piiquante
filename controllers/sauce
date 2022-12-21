@@ -11,6 +11,25 @@ exports.getAllSauces = (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 };
 
+
+// Utilisation de la méthode findOne() du modèle Mongoose qui renvoit un sauce précise avec son id fourni //
+exports.getOneSauce = (req, res, next) => {
+  Sauce.findOne({ // vérifier si une sauce avec l'id contenu dans les param de la req existe 
+    _id: req.params.id  
+  }).then(
+    (sauce) => { // si oui, renvoyer la sauce
+      res.status(200).json(sauce);
+    }
+  ).catch(
+    (error) => {
+      res.status(404).json({
+        error: error
+      });
+    }
+  );
+};
+
+
 //** Création d'une nouvelle sauce et enregistrement de celle-ci dans la bdd */
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce); // parser objet req. pour obtenir un objet exploitable
