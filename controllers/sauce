@@ -32,7 +32,7 @@ exports.getOneSauce = (req, res, next) => {
 
 //** Création d'une nouvelle sauce et enregistrement de celle-ci dans la bdd */
 exports.createSauce = (req, res, next) => {
-  const sauceObject = JSON.parse(req.body.sauce); // parser objet req. pour obtenir un objet exploitable
+  const sauceObject = JSON.parse(req.body.sauce); // Création d'un objet sauce et parser objet req. pour obtenir un objet exploitable
   // suppresion de champs dans l'objet
    delete sauceObject._id; // champs _id, car id sera automatiquement généré par la bdd 
    delete sauceObject._userId; // champs userId (celui qui a crée l'objet, la sauce), mesure de sécu = ne pas faire confiance au client
@@ -47,25 +47,28 @@ exports.createSauce = (req, res, next) => {
 };
 
 
-//** Modifier une sauce via son id */
+//** Modifier une sauce via son id selon que l'utilisateur souhaite modifier ou non un fichier */
 exports.modifySauce = (req, res, next) => {
-  const sauceObject = req.file ? {
+  // Vérification de l'existance d'un champs file dans notre req (si la modification contient un chgt d'image) 
+  const sauceObject = req.file ? { 
+    // si oui, récup de l'objet en parsant la chaine de caractère (en faire un objet exploitable)
       ...JSON.parse(req.body.sauce),
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-  } : { ...req.body };
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` // on récrée l'URL de l'image
+  } : { ...req.body }; // sinon, récup de l'objet direcement dans le corp de la req 
 
-  delete sauceObject._userId;
-  Sauce.findOne({_id: req.params.id})
-      .then((sauce) => {
-          if (sauce.userId != req.auth.userId) {
+  delete sauceObject._userId; // supp de l'userId de la req (éviter qu'un user crée une sauce à son nom et le modifie pour le réassigner à qn d'autre)
+  // Chercher la sauce/obj à modifier dans la bdd et vérifier si l'user qui veut modif la sauce est bien l'auteur
+  Sauce.findOne({_id: req.params.id}) // récup la sauce en bdd 
+      .then((sauce) => { // vérifier si l'user est l'auteur 
+          if (sauce.userId != req.auth.userId) { // si userid recup en bdd est diff de userId du token 
               res.status(401).json({ message : 'Not authorized'});
-          } else {
-              Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
+          } else { // si userId === auteur, maj de la sauce
+              Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id}) // {obj à mettre à jour}, avec quel objet = > {recup dans le corps la fonction, id param de l'URL}
               .then(() => res.status(200).json({message : 'Sauce modifiée!'}))
               .catch(error => res.status(401).json({ error }));
           }
       })
       .catch((error) => {
-          res.status(400).json({ error });
+          res.status(400).json({ error }); // sauce inexistante en bdd 
       });
 };
