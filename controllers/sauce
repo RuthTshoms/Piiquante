@@ -1,7 +1,7 @@
 //** Logique métier des routes "sauce" */
 
 const Sauce = require('../models/sauce');
-// require fs ? (permet de supprimer les fichiers)
+const fs = require('fs'); // package node "file system" qui permet de modifier le système de fichiers, notamment en permettant la suppression de fichiers.
 // const jwt = require('jsonwebtoken'); à supprimer 
 
 // Utilisation de la méthode find() du modèle Mongoose qui renvoit un tableau de toutes les Sauces de notre base de données
@@ -47,7 +47,7 @@ exports.createSauce = (req, res, next) => {
 };
 
 
-//** Modifier une sauce via son id selon que l'utilisateur souhaite modifier ou non un fichier */
+//** Modifier une sauce via son id selon que l'utilisateur souhaite modifier ou non un fichier - Vérif des droits d'auteur */
 exports.modifySauce = (req, res, next) => {
   // Vérification de l'existance d'un champs file dans notre req (si la modification contient un chgt d'image) 
   const sauceObject = req.file ? { 
@@ -57,7 +57,7 @@ exports.modifySauce = (req, res, next) => {
   } : { ...req.body }; // sinon, récup de l'objet direcement dans le corp de la req 
 
   delete sauceObject._userId; // supp de l'userId de la req (éviter qu'un user crée une sauce à son nom et le modifie pour le réassigner à qn d'autre)
-  // Chercher la sauce/obj à modifier dans la bdd et vérifier si l'user qui veut modif la sauce est bien l'auteur
+  // Chercher la sauce/obj à modifier dans la bdd et vérifier si l'user qui veut modif la sauce en est bien l'auteur
   Sauce.findOne({_id: req.params.id}) // récup la sauce en bdd 
       .then((sauce) => { // vérifier si l'user est l'auteur 
           if (sauce.userId != req.auth.userId) { // si userid recup en bdd est diff de userId du token 
@@ -70,5 +70,28 @@ exports.modifySauce = (req, res, next) => {
       })
       .catch((error) => {
           res.status(400).json({ error }); // sauce inexistante en bdd 
+      });
+};
+
+
+//** Suppression d'une sauce via son id - Vérif des droits d'auteur */
+exports.deleteSauce = (req, res, next) => {
+  // Chercher la sauce/obj à supp dans la bdd et vérifier si l'user qui veut supp la sauce en est bien l'auteur
+  Sauce.findOne({ _id: req.params.id})
+      .then(sauce => {
+          if (sauce.userId != req.auth.userId) {
+              res.status(401).json({message: 'Not authorized'});
+          } else { // si l'userId est l'auteur, supp l'obj de la bdd et l'image du fs (syst de fichier)
+              const filename = sauce.imageUrl.split('/images/')[1]; // recup de l'URL du fichier enrg dans le rep /image
+              fs.unlink(`images/${filename}`, () => { // suppresion du fichier via methode unlink de fs + chemin 
+                  // Callback de la fonction : méthode appelée une fois la supp faite (supp asynchrone)
+                  Sauce.deleteOne({_id: req.params.id}) // supp de l'obj dans la bdd 
+                      .then(() => { res.status(200).json({message: 'Sauce supprimée !'})})
+                      .catch(error => res.status(401).json({ error }));
+              });
+          }
+      })
+      .catch( error => { // sauce inexistante en bdd 
+          res.status(500).json({ error });
       });
 };
