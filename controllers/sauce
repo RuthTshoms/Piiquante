@@ -4,7 +4,25 @@ const Sauce = require('../models/sauce');
 const fs = require('fs'); // package node "file system" qui permet de modifier le système de fichiers, notamment en permettant la suppression de fichiers.
 // const jwt = require('jsonwebtoken'); à supprimer 
 
-// Utilisation de la méthode find() du modèle Mongoose qui renvoit un tableau de toutes les Sauces de notre base de données
+
+/** Création d'une nouvelle sauce et enregistrement de celle-ci dans la bdd */
+exports.createSauce = (req, res, next) => {
+  const sauceObject = JSON.parse(req.body.sauce); // Création d'un objet sauce et parser objet req. pour obtenir un objet exploitable
+  // suppresion de champs dans l'objet
+   delete sauceObject._id; // champs _id, car id sera automatiquement généré par la bdd 
+   delete sauceObject._userId; // champs userId (celui qui a crée l'objet, la sauce), mesure de sécu = ne pas faire confiance au client
+   const sauce = new Sauce({ // création d'un nouvel objet sauce sur base du modele mongoose 
+       ...sauceObject, // spread operator qui reprend tous les champs à remplir pour créer une sauce, moins les deux champs supprimés
+       userId: req.auth.userId, // extraction de l'userId de l'objet req.
+       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` // génération de l'url de l'image manuellement en faisant appelle à des propriétés de l'objet req. (${})
+   });
+   sauce.save() 
+   .then(() => { res.status(201).json({message: 'Sauce enregistrée !'})})
+   .catch(error => { res.status(400).json( { error })})
+};
+
+
+/** Utilisation de la méthode find() du modèle Mongoose qui renvoit un tableau de toutes les Sauces de notre base de données */
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then(sauces => res.status(200).json(sauces))
@@ -12,7 +30,7 @@ exports.getAllSauces = (req, res, next) => {
 };
 
 
-// Utilisation de la méthode findOne() du modèle Mongoose qui renvoit un sauce précise avec son id fourni //
+/** Utilisation de la méthode findOne() du modèle Mongoose qui renvoit un sauce précise avec son id fourni */
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({ // vérifier si une sauce avec l'id contenu dans les param de la req existe 
     _id: req.params.id  
@@ -29,22 +47,6 @@ exports.getOneSauce = (req, res, next) => {
   );
 };
 
-
-//** Création d'une nouvelle sauce et enregistrement de celle-ci dans la bdd */
-exports.createSauce = (req, res, next) => {
-  const sauceObject = JSON.parse(req.body.sauce); // Création d'un objet sauce et parser objet req. pour obtenir un objet exploitable
-  // suppresion de champs dans l'objet
-   delete sauceObject._id; // champs _id, car id sera automatiquement généré par la bdd 
-   delete sauceObject._userId; // champs userId (celui qui a crée l'objet, la sauce), mesure de sécu = ne pas faire confiance au client
-   const sauce = new Sauce({ // création d'un nouvel objet sauce sur base du modele mongoose 
-       ...sauceObject, // spread operator qui reprend tous les champs à remplir pour créer une sauce, moins les deux champs supprimés
-       userId: req.auth.userId, // extraction de l'userId de l'objet req.
-       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` // génération de l'url de l'image manuellement en faisant appelle à des propriétés de l'objet req. (${})
-   });
-   sauce.save() 
-   .then(() => { res.status(201).json({message: 'Sauce enregistrée !'})})
-   .catch(error => { res.status(400).json( { error })})
-};
 
 
 //** Modifier une sauce via son id selon que l'utilisateur souhaite modifier ou non un fichier - Vérif des droits d'auteur */
