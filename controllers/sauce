@@ -101,32 +101,32 @@ exports.deleteSauce = (req, res, next) => {
 
 //** Liker ou disliker une sauce et Retirer son like ou son dislike */
 exports.like = (req, res, next) => {
-  const like = req.body.like;
+  const like = req.body.like; // récup du nbre de like dans le corps de la req (0 par défaut)
 
-  if (like === 1) { // bouton j'aime
-      Sauce.findOne({ _id: req.params.id })
+  if (like === 1) { // Pour liker 
+      Sauce.findOne({ _id: req.params.id }) // chercher la sauce à liker ou disliker 
           .then((sauce) => {
-              //On regarde si l'utilisateur n'a pas déjà liké ou disliké la sauce
+              // Si l'utilisateur a déjà liké ou disliké la sauce
               if (sauce.usersDisliked.includes(req.body.userId) || sauce.usersLiked.includes(req.body.userId)) {
                   res.status(401).json({ message: 'Opération non autorisée !'});
-              } else {
-                  Sauce.updateOne({ _id: req.params.id }, {
-                      //Insère le userId dans le tableau usersLiked du modèle
+              } else { // Si l'utilisateur n'a ni liker ou disliker  la sauce 
+                  Sauce.updateOne({ _id: req.params.id }, { // l'objet à maj
+                      // Insère le userId dans le tableau usersLiked du modèle
                       $push: { usersLiked: req.body.userId },
                       //Ajoute le like
                       $inc: { likes: +1 },
               }) 
-                  .then(() => res.status(200).json({ message: 'J\'aime !' }))
+                  .then(() => res.status(200).json({ message: "J'aime !" }))
                   .catch((error) => res.status(400).json({ error }));
               }
           })
           .catch((error) => res.status(404).json({ error }));
   };
-  if (like === -1) { // bouton je n'aime pas 
+  if (like === -1) { // Pour disliker 
       Sauce.findOne({ _id: req.params.id })
           .then((sauce) => {
-              //On regarde si l'utilisateur n'a pas déjà liké ou disliké la sauce
-              if (sauce.usersDisliked.includes(req.body.userId) || sauce.usersLiked.includes(req.body.userId)) {
+              // Si l'utilisateur a déjà liké ou disliké la sauce
+              if (sauce.usersDisliked.includes(req.body.userId) || sauce.usersLiked.includes(req.body.userId)) { // voir si tableau d'userId qui ont liké/ disliké la sauce contient l'userId du corps de la req
                   res.status(401).json({ message: 'Opération non autorisée !'});
               } else {
                   Sauce.updateOne({ _id: req.params.id }, {
@@ -135,7 +135,7 @@ exports.like = (req, res, next) => {
                       //Ajoute le dislike
                       $inc: { dislikes: +1 },
               }) 
-                  .then(() => res.status(200).json({ message: 'Je n\'aime pas !' }))
+                  .then(() => res.status(200).json({ message: "Je n'aime pas !" }))
                   .catch((error) => res.status(400).json({ error }));
               }
           })
@@ -143,18 +143,18 @@ exports.like = (req, res, next) => {
 };
 
 //** Supprimer son like oun son dislike */
-if (like === 0) {
+if (like === 0) { // Pour annuler son like (pour qu'il soit à 0)
   Sauce.findOne({ _id: req.params.id })
       .then((sauce) => {
           //Regarde si le userId est déjà dans le tableau usersliked/disliked
-          if (sauce.usersLiked.includes(req.body.userId)) {
+          if (sauce.usersLiked.includes(req.body.userId)) { // voir si on peut faire un || sauce.userDisliked.includes(req.body.userId), mais bon n'envoie pas la même promesse 
               Sauce.updateOne({ _id: req.params.id }, {
                   //Retire le userId dans le tableau usersliked du modèle
                   $pull: { usersLiked: req.body.userId },
                   //Retire le likes
                   $inc: { likes: -1 },
               })
-                  .then(() => res.status(200).json({ message: 'J\'aime retiré !' }))
+                  .then(() => res.status(200).json({ message: "J'aime retiré !" }))
                   .catch((error) => res.status(400).json({ error }))
           };
           if (sauce.usersDisliked.includes(req.body.userId)) {
@@ -164,7 +164,7 @@ if (like === 0) {
                   //Retire le dislikes
                   $inc: { dislikes: -1 },
               })
-                  .then(() => res.status(200).json({ message: 'Je n\'aime pas retiré !' }))
+                  .then(() => res.status(200).json({ message: "Je n'aime pas retiré !" }))
                   .catch((error) => res.status(400).json({ error }))
           };
       })

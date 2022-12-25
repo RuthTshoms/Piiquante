@@ -11,7 +11,7 @@ const sauceSchema = mongoose.Schema({
   heat: { type: Number, required: true },
   like: { type: Number, default: 0 }, // définir 0 par défaut
   dislike: { type: Number, default: 0 },
-  usersLiked: { type: [String] }, // de type tableau contenant des chaînes de caractères
+  usersLiked: { type: [String] }, // de type tableau contenant des chaînes de caractères (les userId de ceux ayant liké la sauce)
   usersDisliked: { type: [String] },
 });
 
